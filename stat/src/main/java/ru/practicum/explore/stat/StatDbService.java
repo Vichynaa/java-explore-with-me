@@ -1,6 +1,5 @@
 package ru.practicum.explore.stat;
 
-import exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,11 +47,8 @@ public class StatDbService implements StatInterface {
                     infoList.add(convertToStat(statRepository.findInfoByUri(startTime, endTime, uri), uri));
                 }
             }
-        } else {
-            log.error("Укажите uris");
-            throw new ValidationException("Укажите uris");
         }
-        return infoList;
+        return infoList.stream().sorted(Comparator.comparingInt(ViewStats::getHits).reversed()).toList();
     }
 
     private ViewStats convertToStat(List<EndpointHit> endpointHits, String uri) {
