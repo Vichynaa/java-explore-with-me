@@ -54,6 +54,10 @@ public class StatDbService implements StatInterface {
                 } else {
                     infoList.add(convertToStat(statRepository.findTopUri(startTime, endTime), Optional.empty()));
                 }
+            } else {
+                for (int i = 0; i < 2; i++) {
+                    infoList.add(convertToStat(List.of(new EndpointHit()), Optional.of("Не найдено")));
+                }
             }
         }
         return infoList.stream().sorted(Comparator.comparingInt(ViewStats::getHits).reversed()).toList();
