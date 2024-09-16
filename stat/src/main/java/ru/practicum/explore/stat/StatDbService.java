@@ -37,21 +37,29 @@ public class StatDbService implements StatInterface {
     public List<ViewStats> getStat(String start, String end, Optional<List<String>> uris, boolean unique) {
         List<ViewStats> infoList = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Timestamp startTime = Timestamp.valueOf(LocalDateTime.parse(start, formatter));
+        Timestamp endTime = Timestamp.valueOf(LocalDateTime.parse(end, formatter));
         if (uris.isPresent()) {
             for (String uri: uris.get()) {
-                Timestamp startTime = Timestamp.valueOf(LocalDateTime.parse(start, formatter));
-                Timestamp endTime = Timestamp.valueOf(LocalDateTime.parse(end, formatter));
                 if (unique) {
-                    infoList.add(convertToStat(statRepository.findInfoByUriUnique(startTime, endTime, uri), uri));
+                    infoList.add(convertToStat(statRepository.findInfoByUriUnique(startTime, endTime, uri), Optional.ofNullable(uri)));
                 } else {
-                    infoList.add(convertToStat(statRepository.findInfoByUri(startTime, endTime, uri), uri));
+                    infoList.add(convertToStat(statRepository.findInfoByUri(startTime, endTime, uri), Optional.ofNullable(uri)));
+                }
+            }
+        } else {
+            if (statRepository.checkBd().isPresent()) {
+                if (unique) {
+                    infoList.add(convertToStat(statRepository.findTopUniqueUri(startTime, endTime), Optional.empty()));
+                } else {
+                    infoList.add(convertToStat(statRepository.findTopUri(startTime, endTime), Optional.empty()));
                 }
             }
         }
         return infoList.stream().sorted(Comparator.comparingInt(ViewStats::getHits).reversed()).toList();
     }
 
-    private ViewStats convertToStat(List<EndpointHit> endpointHits, String uri) {
+    private ViewStats convertToStat(List<EndpointHit> endpointHits, Optional<String> uri) {
         ViewStats viewStats = new ViewStats();
         if (endpointHits.isEmpty()) {
             viewStats.setApp("Не найдено информации о представленном uri");
@@ -59,7 +67,11 @@ public class StatDbService implements StatInterface {
             viewStats.setApp(endpointHits.getFirst().getApp());
         }
         viewStats.setHits(endpointHits.size());
-        viewStats.setUri(uri);
+        if (uri.isPresent()) {
+            viewStats.setUri(uri.get());
+        } else {
+            viewStats.setUri(endpointHits.getFirst().getUri());
+        }
         return viewStats;
     }
 }
