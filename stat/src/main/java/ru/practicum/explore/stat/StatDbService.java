@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -42,26 +43,24 @@ public class StatDbService implements StatInterface {
         if (uris.isPresent()) {
             for (String uri: uris.get()) {
                 if (unique) {
-                    infoList.add(convertToStat(statRepository.findInfoByUriUnique(startTime, endTime, uri), Optional.ofNullable(uri)));
+                    infoList.add(convertToStat(statRepository.findInfoByUriUnique(startTime, endTime, uri), uri));
                 } else {
-                    infoList.add(convertToStat(statRepository.findInfoByUri(startTime, endTime, uri), Optional.ofNullable(uri)));
+                    infoList.add(convertToStat(statRepository.findInfoByUri(startTime, endTime, uri), uri));
                 }
             }
         } else {
             if (statRepository.checkBd().isPresent()) {
                 if (unique) {
-                    infoList.add(convertToStat(statRepository.findTopUniqueUri(startTime, endTime), Optional.empty()));
-                    infoList.add(convertToStat(statRepository.findTopUniqueUri(startTime, endTime), Optional.empty()));
+                    return convertToTop2Stats(statRepository.findTopUniqueUri(startTime, endTime));
                 } else {
-                    infoList.add(convertToStat(statRepository.findTopUri(startTime, endTime), Optional.empty()));
-                    infoList.add(convertToStat(statRepository.findTopUri(startTime, endTime), Optional.empty()));
+                    return convertToTop2Stats(statRepository.findTopUri(startTime, endTime));
                 }
             }
         }
         return infoList.stream().sorted(Comparator.comparingInt(ViewStats::getHits).reversed()).toList();
     }
 
-    private ViewStats convertToStat(List<EndpointHit> endpointHits, Optional<String> uri) {
+    private ViewStats convertToStat(List<EndpointHit> endpointHits, String uri) {
         ViewStats viewStats = new ViewStats();
         if (endpointHits.isEmpty()) {
             viewStats.setApp("Не найдено информации о представленном uri");
@@ -69,11 +68,25 @@ public class StatDbService implements StatInterface {
             viewStats.setApp(endpointHits.getFirst().getApp());
         }
         viewStats.setHits(endpointHits.size());
-        if (uri.isPresent()) {
-            viewStats.setUri(uri.get());
-        } else {
-            viewStats.setUri(endpointHits.getFirst().getUri());
-        }
+        viewStats.setUri(uri);
         return viewStats;
+    }
+
+    private List<ViewStats> convertToTop2Stats(List<EndpointHit> endpointHits) {
+        String firstUri = endpointHits.getFirst().getUri();
+        List<EndpointHit> firstEndpoint = endpointHits.stream().filter(hit -> hit.getUri().equals(firstUri)).toList();
+        List<EndpointHit> secondEndpoint = endpointHits.stream().filter(hit -> !hit.getUri().equals(firstUri)).toList();
+
+        ViewStats firstUriStat = new ViewStats();
+        firstUriStat.setUri(firstUri);
+        firstUriStat.setApp(firstEndpoint.getFirst().getApp());
+        firstUriStat.setHits(firstEndpoint.size());
+
+        ViewStats secondUriStat = new ViewStats();
+        secondUriStat.setUri(secondEndpoint.getFirst().getUri());
+        secondUriStat.setApp(secondEndpoint.getFirst().getApp());
+        secondUriStat.setHits(secondEndpoint.size());
+
+        return Stream.of(firstUriStat, secondUriStat).sorted((Comparator.comparingInt(ViewStats::getHits))).toList();
     }
 }
