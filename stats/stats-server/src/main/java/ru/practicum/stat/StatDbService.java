@@ -2,7 +2,6 @@ package ru.practicum.stat;
 
 import dto.HitRequest;
 import dto.ViewStats;
-import exception.NotFoundException;
 import exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
