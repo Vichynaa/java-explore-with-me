@@ -5,17 +5,15 @@ import exception.ApiError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore.user.dto.NewUserRequest;
 import ru.practicum.explore.user.model.User;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -24,7 +22,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UserDbService implements UserInterface {
     private final UserRepository userRepository;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     @Transactional
@@ -53,7 +50,7 @@ public class UserDbService implements UserInterface {
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             log.error(String.format("Почта %s уже существует, укажите другую", user.getEmail()));
-            throw new ApiError(String.format("Почта %s уже существует, укажите другую", user.getEmail()), List.of(Arrays.toString(e.getStackTrace())), "Вы используете уже существующую почту", "BAD_REQUEST", LocalDateTime.now().format(formatter));
+            throw new ApiError(String.format("Почта %s уже существует, укажите другую", user.getEmail()), List.of(Arrays.toString(e.getStackTrace())), "Вы используете уже существующую почту", "BAD_REQUEST");
         }
     }
 
@@ -73,28 +70,46 @@ public class UserDbService implements UserInterface {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<User> findAll(Optional<List<Long>> ids, Long from, Long size) {
+        List<User> users;
+        if (ids.isEmpty()) {
+            users = userRepository.findAllByFilters(from, size);
+        } else {
+            users = userRepository.findAllByFiltersWithIds(ids.get(), from, size);
+        }
+        return users;
     }
 
     private void userValidation(String name, String email) {
-        if (name.isBlank() || email.isBlank()) {
+        if (name == null || email == null || name.isBlank() || email.isBlank()) {
             log.error("Поля name и email должны быть заполнен");
-            throw new ApiError("Поля name и email должны быть заполнен", new ArrayList<>(), "Вы не указали имя или почту", "BAD_REQUEST", LocalDateTime.now().format(formatter));
+            throw new ApiError(
+                    "Field: name or email. Error: must not be blank. Value: null",
+                    new ArrayList<>(),
+                    "Incorrectly made request.",
+                    "BAD_REQUEST");
         }
     }
 
     private void emailValidation(String email) {
         if (!email.contains("@")) {
             log.error("Не правильный формат email");
-            throw new ApiError("Не правильный формат email", new ArrayList<>(), "Поле email должно содержать символ @", "BAD_REQUEST", LocalDateTime.now().format(formatter));
+            throw new ApiError(
+                    "Field: email. Error: must contains @. Value: " + email,
+                    new ArrayList<>(),
+                    "Incorrectly made request.",
+                    "BAD_REQUEST");
         }
     }
 
     private void checkUserExistsById(Long userId) {
         if (!userRepository.existsById(userId)) {
             log.error(String.format("Пользователь с id - %d, не найден", userId));
-            throw new ApiError(String.format("Пользователь с id - %d, не найден", userId), new ArrayList<>(), "Аккаунта с таким id не существует", "NOT_FOUND", LocalDateTime.now().format(formatter));
+            throw new ApiError(
+                    String.format("User with id=%d was not found", userId),
+                    new ArrayList<>(),
+                    "The required object was not found.",
+                    "NOT_FOUND");
         }
     }
 }

@@ -1,10 +1,10 @@
 package ru.practicum.explore.user;
 
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explore.user.dto.NewUserRequest;
 import ru.practicum.explore.user.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserInterface {
     User create(NewUserRequest userRequest);
@@ -15,5 +15,5 @@ public interface UserInterface {
 
     String deleteUserById(Long userId);
 
-    List<User> findAll();
+    List<User> findAll(Optional<List<Long>> ids, Long from, Long size);
 }
