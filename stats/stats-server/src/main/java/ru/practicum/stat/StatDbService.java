@@ -2,6 +2,8 @@ package ru.practicum.stat;
 
 import dto.HitRequest;
 import dto.ViewStats;
+import exception.NotFoundException;
+import exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class StatDbService implements StatInterface {
     private final Repository statRepository;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     @Transactional
@@ -36,9 +39,9 @@ public class StatDbService implements StatInterface {
     @Override
     public List<ViewStats> getStat(Optional<String> start, Optional<String> end, Optional<List<String>> uris, boolean unique) {
         List<ViewStats> infoList = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Timestamp startTime = Timestamp.valueOf(LocalDateTime.parse(start.orElse(LocalDateTime.now().plusHours(1).toString()), formatter));
-        Timestamp endTime = Timestamp.valueOf(LocalDateTime.parse(end.orElse(LocalDateTime.now().minusYears(10).toString()), formatter));
+        checkTime(start, end);
+        Timestamp startTime = Timestamp.valueOf(start.get());
+        Timestamp endTime = Timestamp.valueOf(end.get());
         if (uris.isPresent()) {
             for (String uri: uris.get()) {
                 if (unique) {
@@ -87,5 +90,16 @@ public class StatDbService implements StatInterface {
         secondUriStat.setHits(secondEndpoint.size());
 
         return Stream.of(firstUriStat, secondUriStat).sorted((Comparator.comparingInt(ViewStats::getHits))).toList();
+    }
+
+    private void checkTime(Optional<String> startTime, Optional<String> endTime) {
+        if (startTime.isEmpty() || endTime.isEmpty()) {
+            log.error("Время начала и конца выборки статистики должны быть указаны");
+            throw new ValidationException("Время начала и конца выборки статистики должны быть указаны");
+        }
+        if (LocalDateTime.parse(startTime.get(), formatter).isAfter(LocalDateTime.parse(endTime.get(), formatter))) {
+            log.error("Время начала выборки не может быть после времени конца. Values: start=" + startTime + "; end=" + endTime);
+            throw new ValidationException("Время начала выборки не может быть после времени конца. Values: start=" + startTime + "; end=" + endTime);
+        }
     }
 }
