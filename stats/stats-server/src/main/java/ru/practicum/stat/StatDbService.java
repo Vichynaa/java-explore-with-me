@@ -1,5 +1,6 @@
 package ru.practicum.stat;
 
+import constant.Constant;
 import dto.HitRequest;
 import dto.ViewStats;
 import exception.ValidationException;
@@ -11,7 +12,6 @@ import ru.practicum.stat.mapper.StatMapper;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class StatDbService implements StatInterface {
     private final Repository statRepository;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     @Transactional
@@ -96,7 +95,7 @@ public class StatDbService implements StatInterface {
             log.error("Время начала и конца выборки статистики должны быть указаны");
             throw new ValidationException("Время начала и конца выборки статистики должны быть указаны");
         }
-        if (LocalDateTime.parse(startTime.get(), formatter).isAfter(LocalDateTime.parse(endTime.get(), formatter))) {
+        if (LocalDateTime.parse(startTime.get(), Constant.getFORMATTER()).isAfter(LocalDateTime.parse(endTime.get(), Constant.getFORMATTER()))) {
             log.error("Время начала выборки не может быть после времени конца. Values: start=" + startTime + "; end=" + endTime);
             throw new ValidationException("Время начала выборки не может быть после времени конца. Values: start=" + startTime + "; end=" + endTime);
         }

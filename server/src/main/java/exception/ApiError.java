@@ -11,7 +11,7 @@ public class ApiError extends RuntimeException {
     private final List<String> errors;
     private final String reason;
     private final String status;
-    private final String timestamp = LocalDateTime.now().format(Constant.getFormatter());
+    private final String timestamp = LocalDateTime.now().format(Constant.getFORMATTER());
 
     public ApiError(String message, List<String> errors, String reason, String status) {
         super(message);

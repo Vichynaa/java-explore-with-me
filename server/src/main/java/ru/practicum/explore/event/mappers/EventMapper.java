@@ -51,7 +51,7 @@ public class EventMapper {
                     "BAD_REQUEST"
             );
         }
-        event.setEventDate(LocalDateTime.parse(newEventDto.getEventDate(), Constant.getFormatter()));
+        event.setEventDate(LocalDateTime.parse(newEventDto.getEventDate(), Constant.getFORMATTER()));
         event.setAnnotation(newEventDto.getAnnotation());
         event.setCategory(category);
         event.setDescription(newEventDto.getDescription());
@@ -73,7 +73,7 @@ public class EventMapper {
         eventShortDto.setAnnotation(event.getAnnotation());
         eventShortDto.setCategory(CategoryMapper.mapToCategoryDto(event.getCategory()));
         eventShortDto.setId(event.getId());
-        eventShortDto.setEventDate(event.getEventDate().format(Constant.getFormatter()));
+        eventShortDto.setEventDate(event.getEventDate().format(Constant.getFORMATTER()));
         eventShortDto.setPaid(event.getPaid());
         eventShortDto.setInitiator(UserMapper.mapToUserShortDto(event.getInitiator()));
         eventShortDto.setTitle(event.getTitle());
@@ -88,15 +88,15 @@ public class EventMapper {
         eventFullDto.setAnnotation(event.getAnnotation());
         eventFullDto.setCategory(CategoryMapper.mapToCategoryDto(event.getCategory()));
         eventFullDto.setConfirmedRequests(event.getConfirmedRequests());
-        eventFullDto.setCreatedOn(event.getCreatedOn().format(Constant.getFormatter()));
+        eventFullDto.setCreatedOn(event.getCreatedOn().format(Constant.getFORMATTER()));
         eventFullDto.setDescription(event.getDescription());
-        eventFullDto.setEventDate(event.getEventDate().format(Constant.getFormatter()));
+        eventFullDto.setEventDate(event.getEventDate().format(Constant.getFORMATTER()));
         eventFullDto.setInitiator(UserMapper.mapToUserShortDto(event.getInitiator()));
         eventFullDto.setLocation(mapToLocationDto(event.getLocation()));
         eventFullDto.setPaid(event.getPaid());
         eventFullDto.setParticipantLimit(event.getParticipantLimit());
         if (event.getPublishedOn() != null) {
-            eventFullDto.setPublishedOn(event.getPublishedOn().format(Constant.getFormatter()));
+            eventFullDto.setPublishedOn(event.getPublishedOn().format(Constant.getFORMATTER()));
         }
         eventFullDto.setRequestModeration(event.getRequestModeration());
         eventFullDto.setState(event.getState());

@@ -96,8 +96,7 @@ public class RequestDbService implements RequestInterface {
         return requestRepository.save(newRequest);
     }
 
-    private Request getRequest(String status, Optional<Request> newOptRequest) {
-        Request newRequest = newOptRequest.get();
+    private Request getRequest(String status, Request newRequest) {
         if (!newRequest.getStatus().equals("PENDING")) {
             throw new ApiError(
                     "Status of request not eq PENDING. Value: " + newRequest.getStatus(),
@@ -211,20 +210,10 @@ public class RequestDbService implements RequestInterface {
 
     private EventRequestStatusUpdateResult statusRequestUpdateFunc(List<Long> requestsIds, Long eventId, String status) {
         List<Request> newRequests = new ArrayList<>();
-        for (Long requestId : requestsIds) {
-            Optional<Request> request = requestRepository.findById(requestId);
-            if (request.isPresent()) {
+        List<Request> requests = requestRepository.findAllById(requestsIds);
+        for (Request request : requests) {
                 Request newRequest = getRequest(status, request);
                 newRequests.add(newRequest);
-            } else {
-                log.error("Запрос с id - " + requestId + ", не найден.");
-                throw new ApiError(
-                        "Запрос с id - " + requestId + ", не найден.",
-                        new ArrayList<>(),
-                        "Object not found..",
-                        "NOT_FOUND"
-                );
-            }
         }
         requestRepository.saveAll(newRequests);
         EventRequestStatusUpdateResult eventRequestStatusUpdateResult = new EventRequestStatusUpdateResult();

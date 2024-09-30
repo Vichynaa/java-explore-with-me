@@ -13,7 +13,7 @@ public class RequestMapper {
         participationRequestDto.setRequester(request.getRequester().getId());
         participationRequestDto.setId(request.getId());
         participationRequestDto.setStatus(request.getStatus());
-        participationRequestDto.setCreated(request.getCreated().format(Constant.getFormatter()));
+        participationRequestDto.setCreated(request.getCreated().format(Constant.getFORMATTER()));
         participationRequestDto.setEvent(request.getEvent().getId());
         return participationRequestDto;
     }

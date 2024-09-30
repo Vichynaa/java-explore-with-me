@@ -110,7 +110,7 @@ public class EventController {
     private void createHitByRequest(HttpServletRequest request) {
         statClient.createHit(HitRequestCreator.hitRequestCreator(request.getRemoteAddr(),
                 request.getRequestURI(),
-                Constant.getServiceAppName(),
-                LocalDateTime.now().format(Constant.getFormatter())));
+                Constant.getEWM_MAIN_SERVICE(),
+                LocalDateTime.now().format(Constant.getFORMATTER())));
     }
 }

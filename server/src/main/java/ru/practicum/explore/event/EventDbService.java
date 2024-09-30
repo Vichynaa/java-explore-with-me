@@ -126,10 +126,10 @@ public class EventDbService implements EventInterface {
             predicate = predicate.and(event.category.id.in(categories.get()));
         }
         if (rangeStart.isPresent()) {
-            predicate = predicate.and(event.eventDate.goe(LocalDateTime.parse(rangeStart.get(), Constant.getFormatter())));
+            predicate = predicate.and(event.eventDate.goe(LocalDateTime.parse(rangeStart.get(), Constant.getFORMATTER())));
         }
         if (rangeEnd.isPresent()) {
-            predicate = predicate.and(event.eventDate.loe(LocalDateTime.parse(rangeEnd.get(), Constant.getFormatter())));
+            predicate = predicate.and(event.eventDate.loe(LocalDateTime.parse(rangeEnd.get(), Constant.getFORMATTER())));
         }
         return eventRepository.findAll(predicate, PageRequest.of(from.intValue(), size.intValue())).toList();
     }
@@ -157,7 +157,7 @@ public class EventDbService implements EventInterface {
             predicate = predicate.and(event.paid.eq(paid.get()));
         }
         if (rangeStart.isPresent() && rangeEnd.isPresent()) {
-            if (LocalDateTime.parse(rangeStart.get(), Constant.getFormatter()).isAfter(LocalDateTime.parse(rangeEnd.get(), Constant.getFormatter()))) {
+            if (LocalDateTime.parse(rangeStart.get(), Constant.getFORMATTER()).isAfter(LocalDateTime.parse(rangeEnd.get(), Constant.getFORMATTER()))) {
                 log.error("Incorrectly made request, startTime before endTime. Values: " + rangeStart.get() + rangeEnd.get());
                 throw new ApiError(
                         "Incorrectly made request, startTime before endTime. Values: start - "
@@ -167,8 +167,8 @@ public class EventDbService implements EventInterface {
                         "BAD_REQUEST"
                 );
             }
-            predicate = predicate.and(event.eventDate.goe(LocalDateTime.parse(rangeStart.get(), Constant.getFormatter())));
-            predicate = predicate.and(event.eventDate.loe(LocalDateTime.parse(rangeEnd.get(), Constant.getFormatter())));
+            predicate = predicate.and(event.eventDate.goe(LocalDateTime.parse(rangeStart.get(), Constant.getFORMATTER())));
+            predicate = predicate.and(event.eventDate.loe(LocalDateTime.parse(rangeEnd.get(), Constant.getFORMATTER())));
         } else {
             predicate = predicate.and(event.eventDate.goe(LocalDateTime.now()));
         }
@@ -279,7 +279,7 @@ public class EventDbService implements EventInterface {
                     "BAD_REQUEST"
             );
         }
-        LocalDateTime eventDate = LocalDateTime.parse(newEventDto.getEventDate(), Constant.getFormatter());
+        LocalDateTime eventDate = LocalDateTime.parse(newEventDto.getEventDate(), Constant.getFORMATTER());
         if (eventDate.isBefore(LocalDateTime.now())) {
             log.error("Field: eventDate. Error: должно содержать дату, которая еще не наступила. Value: " + newEventDto.getEventDate());
             throw new ApiError(

@@ -55,7 +55,7 @@ public class UpdateEvent {
             event.setDescription(updateEventUserRequest.getDescription());
         }
         if (updateEventUserRequest.getEventDate() != null) {
-            LocalDateTime eventDate = LocalDateTime.parse(updateEventUserRequest.getEventDate(), Constant.getFormatter());
+            LocalDateTime eventDate = LocalDateTime.parse(updateEventUserRequest.getEventDate(), Constant.getFORMATTER());
             if (eventDate.plusHours(2).isBefore(LocalDateTime.now())) {
                 log.error("Field: eventDate. Error: дата и время на которые намечено событие не может быть раньше," +
                         " чем через два часа от текущего момента. Value: " + updateEventUserRequest.getEventDate());
@@ -152,7 +152,7 @@ public class UpdateEvent {
             event.setDescription(updateEventAdminRequest.getDescription());
         }
         if (updateEventAdminRequest.getEventDate() != null) {
-            LocalDateTime eventDate = LocalDateTime.parse(updateEventAdminRequest.getEventDate(), Constant.getFormatter());
+            LocalDateTime eventDate = LocalDateTime.parse(updateEventAdminRequest.getEventDate(), Constant.getFORMATTER());
             if (eventDate.plusHours(1).isBefore(LocalDateTime.now())) {
                 log.error("Field: eventDate. Error: дата и время на которые намечено событие не может быть раньше," +
                         " чем через час от текущего момента. Value: " + updateEventAdminRequest.getEventDate());
