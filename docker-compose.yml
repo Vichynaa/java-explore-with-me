@@ -1,18 +1,6 @@
-services:
-  stats-server:
-    build: stat
-    image: explore-stat
-    container_name: explore-stat
-    ports:
-      - "9090:9090"
-    depends_on:
-      - stats-db
-    environment:
-      - EXPLORE_SERVER_URL=http://server:8080
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat
-      - SPRING_DATASOURCE_USERNAME=stat
-      - SPRING_DATASOURCE_PASSWORD=stat
+version: '3.8'
 
+services:
   stats-db:
     image: postgres:16.1
     container_name: postgres-stat
@@ -30,19 +18,6 @@ services:
       interval: 5s
       retries: 10
 
-  ewm-service:
-    build: server
-    image: explore-service
-    container_name: explore-service
-    ports:
-      - "8080:8080"
-    depends_on:
-      - ewm-db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore-server
-      - SPRING_DATASOURCE_USERNAME=explore-server
-      - SPRING_DATASOURCE_PASSWORD=explore-server
-
   ewm-db:
     image: postgres:16.1
     container_name: postgres-server
@@ -59,3 +34,35 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  stats-server:
+    build: stats/stats-server
+    image: explore-stat
+    container_name: explore-stat
+    ports:
+      - "9090:9090"
+    depends_on:
+      stats-db:
+        condition: service_healthy
+    environment:
+      - EXPLORE_SERVER_URL=http://server:8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat
+      - SPRING_DATASOURCE_USERNAME=stat
+      - SPRING_DATASOURCE_PASSWORD=stat
+    command: /bin/sh -c "sleep 35 && java -jar /app.jar"
+
+  ewm-service:
+    build: server
+    image: explore-service
+    container_name: explore-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      ewm-db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore-server
+      - SPRING_DATASOURCE_USERNAME=explore-server
+      - SPRING_DATASOURCE_PASSWORD=explore-server
+      - EXPLORE_SERVER_URL=http://stats-server:9090
+    command: /bin/sh -c "sleep 35 && java -jar /app.jar"

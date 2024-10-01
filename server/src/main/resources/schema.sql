@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(250) NOT NULL CHECK (LENGTH(name) >= 2),
     email VARCHAR(254) NOT NULL UNIQUE CHECK (LENGTH(email) >= 6)
                                        CHECK (LENGTH(SPLIT_PART(email, '@', 1)) <= 64)
-                                       CHECK (LENGTH(SPLIT_PART(SPLIT_PART(email, '@', 2), '.', 1)) <= 63)
+                                       CHECK (LENGTH(SPLIT_PART(email, '@', 2)) <= 63)
 );
 
 CREATE TABLE IF NOT EXISTS compilations (
