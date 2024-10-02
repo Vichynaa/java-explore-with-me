@@ -23,7 +23,9 @@
                   "pm.test(\"Response have body\", function () {\r",
                   "    pm.response.to.be.withBody;\r",
                   "    pm.response.to.be.json;\r",
-                  "});"
+                  "});\r",
+                  "const response = pm.response.json();\r",
+                  "pm.collectionVariables.set('userId', response.id);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -70,7 +72,9 @@
                   "pm.test(\"Response have body\", function () {\r",
                   "    pm.response.to.be.withBody;\r",
                   "    pm.response.to.be.json;\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.collectionVariables.set('categoryId', response.id);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -117,7 +121,9 @@
                   "pm.test(\"Response have body\", function () {\r",
                   "    pm.response.to.be.withBody;\r",
                   "    pm.response.to.be.json;\r",
-                  "});"
+                  "});\r",
+                  "const response = pm.response.json();\r",
+                  "pm.collectionVariables.set('eventId', response.id);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -137,14 +143,14 @@
               }
             },
             "url": {
-              "raw": "localhost:8080/users/1/events",
+              "raw": "localhost:8080/users/{{userId}}/events",
               "host": [
                 "localhost"
               ],
               "port": "8080",
               "path": [
                 "users",
-                "1",
+                "{{userId}}",
                 "events"
               ]
             }
@@ -184,7 +190,9 @@
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
               "    pm.expect(source.text).equal(JSON.stringify(target).text, 'text комментария должен соответствовать искомому');\r",
-              "});"
+              "});\r",
+              "const response = pm.response.json();\r",
+              "pm.collectionVariables.set('commentId', response.id);"
             ],
             "type": "text/javascript",
             "packages": {}
@@ -204,16 +212,16 @@
           }
         },
         "url": {
-          "raw": "localhost:8080/users/1/events/1/comments",
+          "raw": "localhost:8080/users/{{userId}}/events/{{eventId}}/comments",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
             "users",
-            "1",
+            "{{userId}}",
             "events",
-            "1",
+            "{{eventId}}",
             "comments"
           ]
         }
@@ -253,16 +261,16 @@
           }
         },
         "url": {
-          "raw": "localhost:8080/users/1/events/1/comments",
+          "raw": "localhost:8080/users/{{userId}}/events/{{eventId}}/comments",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
             "users",
-            "1",
+            "{{userId}}",
             "events",
-            "1",
+            "{{eventId}}",
             "comments"
           ]
         }
@@ -320,16 +328,16 @@
           }
         },
         "url": {
-          "raw": "localhost:8080/users/1/comments/1",
+          "raw": "localhost:8080/users/{{userId}}/comments/{{commentId}}",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
             "users",
-            "1",
+            "{{userId}}",
             "comments",
-            "1"
+            "{{commentId}}"
           ]
         }
       },
@@ -533,6 +541,14 @@
   "variable": [
     {
       "key": "requestBody",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
       "value": ""
     }
   ]
