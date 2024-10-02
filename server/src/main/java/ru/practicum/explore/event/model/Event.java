@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.explore.category.model.Category;
+import ru.practicum.explore.event.comment.model.Comment;
 import ru.practicum.explore.event.location.Location;
 import ru.practicum.explore.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -50,4 +53,6 @@ public class Event {
     private String title;
     @Column(name = "views")
     private Long views;
+    @OneToMany(mappedBy = "event")
+    private List<Comment> comments = new ArrayList<>();
 }
