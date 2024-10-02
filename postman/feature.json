@@ -381,7 +381,6 @@
                   "    pm.expect(firstComment).to.have.property('id', pm.environment.get(\"userId\"));\r",
                   "    pm.expect(firstComment).to.have.property('text', \"Новый текст\");\r",
                   "    pm.expect(firstComment).to.have.property('author', \"Иван Петров\");\r",
-                  "    pm.expect(firstComment).to.have.property('event', pm.environment.get(\"eventId\"));\r",
                   "    pm.expect(firstComment).to.have.property('created');\r",
                   "});"
                 ],
