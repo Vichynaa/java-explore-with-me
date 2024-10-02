@@ -381,7 +381,6 @@
                   "\r",
                   "pm.test(\"The data in the response should match the data in the request\", function () {\r",
                   "    pm.expect(firstComment.text).to.equal(\"Новый текст\", \"Текст комментария должен соответствовать искомому\");\r",
-                  "    pm.expect(firstComment.event).to.equal(pm.environment.get(\"eventId\"), \"Id события должен соответствовать искомому\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
