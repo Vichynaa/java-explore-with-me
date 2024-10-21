@@ -311,7 +311,8 @@ public class EventDbService implements EventInterface {
         }
     }
 
-    private void checkEventExists(Long eventId) {
+    @Override
+    public void checkEventExists(Long eventId) {
         if (eventRepository.findById(eventId).isEmpty()) {
             log.error("События с id - " + eventId + ", не найдено");
             throw new ApiError(

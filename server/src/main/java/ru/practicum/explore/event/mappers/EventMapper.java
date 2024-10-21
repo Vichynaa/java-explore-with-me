@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.explore.category.mappers.CategoryMapper;
 import ru.practicum.explore.category.model.Category;
+import ru.practicum.explore.event.comment.mappers.CommentMapper;
+import ru.practicum.explore.event.comment.model.Comment;
 import ru.practicum.explore.event.dto.EventFullDto;
 import ru.practicum.explore.event.dto.EventShortDto;
 import ru.practicum.explore.event.dto.LocationDto;
@@ -18,6 +20,7 @@ import ru.practicum.explore.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -68,6 +71,7 @@ public class EventMapper {
         return event;
     }
 
+
     public static EventShortDto mapToEventShortDto(Event event) {
         EventShortDto eventShortDto = new EventShortDto();
         eventShortDto.setAnnotation(event.getAnnotation());
@@ -79,6 +83,7 @@ public class EventMapper {
         eventShortDto.setTitle(event.getTitle());
         eventShortDto.setConfirmedRequests(event.getConfirmedRequests());
         eventShortDto.setViews(event.getViews());
+        eventShortDto.setComments(event.getComments().stream().sorted(Comparator.comparing(Comment::getCreated).reversed()).map(CommentMapper::mapToCommentDto).toList());
         return eventShortDto;
     }
 
@@ -102,6 +107,7 @@ public class EventMapper {
         eventFullDto.setState(event.getState());
         eventFullDto.setTitle(event.getTitle());
         eventFullDto.setViews(event.getViews());
+        eventFullDto.setComments(event.getComments().stream().sorted(Comparator.comparing(Comment::getCreated).reversed()).map(CommentMapper::mapToCommentDto).toList());;
         return eventFullDto;
     }
 

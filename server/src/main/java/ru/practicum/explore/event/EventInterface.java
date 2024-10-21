@@ -43,5 +43,7 @@ public interface EventInterface {
     @Transactional
     Event adminUpdate(UpdateEventAdminRequest updateEventAdminRequest, Long eventId);
 
+    void checkEventExists(Long eventId);
+
     void checkInitiator(Long eventId, Long userId);
 }
